@@ -1,240 +1,237 @@
 # README
-# Banking System API
+# 🏦 Banking System API
 
-A personal Spring Boot project simulating a basic **banking system** with account management, fund transfers, transaction history, and an interest calculator.
-This project is designed to practice **REST API development**, **transaction handling**, and **data consistency** using Spring Boot and MySQL.
+A comprehensive Spring Boot project simulating a real-world **Banking Backend System**, built with clean architecture, SOLID principles, DTO-based design, and layered structure.  
+This system covers account operations, fund transfers, monthly statements, loan processing, admin dashboard analytics, and multiple financial calculators.
 
----
-
-## Features
-
-### Account Management
-
-* Create new accounts
-* Deposit and withdraw funds
-* View account details and balance
-
-### Fund Transfers
-
-* Transfer funds between accounts
-* Validates sufficient balance and prevents self-transfer
-* Uses `@Transactional` for atomic updates
-
-### Transaction History
-
-* Logs all deposits, withdrawals, and transfers
-* Fetch last N transactions per account
-
-### Interest Calculator
-
-* Calculates **simple interest** and **total payable amount**
-* Formula: `(Principal * Rate * Time) / 100`
-* Input validation for positive numbers
+This project also focuses on **transaction safety**, **data consistency**, **strategy-based business logic**, and **extensibility**.
 
 ---
 
-## Tech Stack
+# ✨ Features
 
-| Component      | Technology               |
-| -------------- | ------------------------ |
-| **Backend**    | Spring Boot 3.x          |
-| **Language**   | Java 17                  |
-| **Database**   | MySQL / H2 (for testing) |
-| **ORM**        | Spring Data JPA          |
-| **Validation** | Jakarta Bean Validation  |
-| **Testing**    | JUnit 5                  |
-| **Build Tool** | Maven                    |
+## 1️⃣ Account Management
+
+- Create new accounts  
+- Deposit funds  
+- Withdraw funds  
+- Fetch account details  
+- View all accounts  
+
+### ✔ Endpoints
+POST /accounts
+GET /accounts/{id}
+POST /accounts/{id}/deposit
+POST /accounts/{id}/withdraw
+GET /accounts
+---
+
+## 2️⃣ Fund Transfers
+
+- Transfer funds between two accounts  
+- Validates sufficient balance  
+- Prevents transfer to same account  
+- Uses `@Transactional` to ensure atomic debit/credit  
+
+### ✔ Endpoint
+POST /accounts/transfer
+---
+
+## 3️⃣ Transaction History
+
+- Logs every **deposit**, **withdrawal**, and **transfer**  
+- Fetches last N transactions for any account  
+
+### ✔ Endpoint
+GET /accounts/{id}/transactions
+---
+
+## 4️⃣ Simple Interest Calculator
+
+- Computes simple interest  
+- Returns interest + total payable amount  
+- Validates all input fields  
+
+### ✔ Endpoint
+POST /calculateInterest
+---
+
+## 5️⃣ Loan Eligibility Checker
+
+Evaluates if a user qualifies for a loan based on:
+
+- Age  
+- Annual income  
+- Credit score  
+- Existing loan amount  
+
+Applies rules:
+- Min age: 21  
+- Income > 3,00,000  
+- Credit score ≥ 700  
+- Loan-to-income ratio < 40%
+
+### ✔ Endpoint
+POST /loanEligibility
+---
+
+## 6️⃣ Fixed Deposit (FD) Calculator — Compound Interest
+
+- Calculates maturity using **compound interest**  
+- Supports **premature withdrawal**  
+- Applies **Penalty Strategy Pattern** (extensible)  
+- Clean separation of business rules  
+
+### ✔ Endpoint
+POST /fixedDeposit
+---
+
+## 7️⃣ Monthly Account Statement
+
+Generates monthly statement including:
+
+- Opening balance  
+- Total deposits  
+- Total withdrawals  
+- Closing balance  
+- Month summary  
+
+Additional features:
+
+- Export statement as **CSV**  
+- Export statement as **PDF**  
+- Optional: Email delivery  
+
+### ✔ Endpoint
+GET /statement/{accountId}?month=MM&year=YYYY
+---
+
+## 8️⃣ Admin Dashboard Analytics
+
+Admin reporting system using **JPQL aggregation** + optional caching.
+
+Includes:
+
+- Total customers  
+- Total account deposits  
+- Top-performing accounts (> ₹1,00,000)  
+- Loan summary: total active loans & total loan amount  
+- Full consolidated report  
+
+### ✔ Endpoints
+GET /admin/totalCustomers
+GET /admin/totalDeposits
+GET /admin/topAccounts
+GET /admin/loanSummary
+GET /admin/fullReport
+---
+
+## 9️⃣ Loan Management Module
+
+Handles the loan lifecycle:
+
+- Create a loan  
+- Fetch loan details  
+- Fetch all loans or filter by account  
+- Close a loan  
+
+### ✔ Endpoints
+POST /loans
+GET /loans
+GET /loans/{loanId}
+PUT /loans/{loanId}/close
+---
+
+# ⚙️ Tech Stack
+
+| Component | Technology |
+|----------|------------|
+| Backend | Spring Boot 3.x |
+| Language | Java 17 |
+| Database | MySQL / H2 |
+| ORM | Spring Data JPA |
+| Validation | Jakarta Bean Validation |
+| Build Tool | Maven |
+| Testing | JUnit 5 |
+| API Docs (Optional) | Swagger / Springdoc |
 
 ---
 
-## API Endpoints
+# 🧠 Architecture
 
-### Account Management
+This project follows a **clean layered architecture**:
 
-| Method | Endpoint                  | Description          |
-| ------ | ------------------------- | -------------------- |
-| `POST` | `/accounts`               | Create a new account |
-| `GET`  | `/accounts/{id}`          | Get account details  |
-| `POST` | `/accounts/{id}/deposit`  | Deposit funds        |
-| `POST` | `/accounts/{id}/withdraw` | Withdraw funds       |
+src/main/java/com/example/bankingsystem/
+├── controller/ → REST endpoints
+├── service/ → Business logic
+├── repository/ → JPA repositories
+├── dto/ → Request/Response models
+├── model/ → Entity classes
+├── util/ → Exporters, strategy classes
+├── exception/ → Global exception handling
+└── config/ → App configs (Swagger, caching)
+---
 
-**Example Request**
+# 🧱 SOLID Principles Applied
 
-```json
-{
-  "name": "Simon",
-  "initialDeposit": 10000
-}
-```
+- **Single Responsibility**  
+  Every class handles one job only (e.g., StatementService only calculates statements).
 
-**Response**
+- **Open/Closed**  
+  New penalty rules, admin reports, and statement formats can be added **without modifying existing logic**.
 
-```json
-{
-  "accountID": 101,
-  "balance": 10000
-}
-```
+- **Liskov Substitution**  
+  Services are interface-based — implementations can be replaced anytime.
+
+- **Interface Segregation**  
+  Clean and focused service interfaces (LoanService, StatementService, AdminDashboardService).
+
+- **Dependency Inversion**  
+  Controllers depend on abstractions, not concrete classes.
 
 ---
 
-### Fund Transfer
+# 🛠 Setup Instructions
 
-| Method | Endpoint             | Description                     |
-| ------ | -------------------- | ------------------------------- |
-| `POST` | `/accounts/transfer` | Transfer money between accounts |
-
-**Example Request**
-
-```json
-{
-  "fromAccount": 101,
-  "toAccount": 102,
-  "amount": 1500
-}
-```
-
-**Response**
-
-```json
-{
-  "message": "Transfer Successful",
-  "fromAccount": 101,
-  "toAccount": 102,
-  "amountTransferred": 1500,
-  "remainingBalance": 8500
-}
-```
-
----
-
-### Transaction History
-
-| Method | Endpoint                      | Description                                 |
-| ------ | ----------------------------- | ------------------------------------------- |
-| `GET`  | `/accounts/{id}/transactions` | Retrieve last N transactions for an account |
-
-**Example Response**
-
-```json
-[
-  { "type": "DEPOSIT", "amount": 1000, "date": "2025-10-24" },
-  { "type": "WITHDRAW", "amount": 100, "date": "2025-10-25" },
-  { "type": "TRANSFER_OUT", "amount": 1500, "date": "2025-10-25" }
-]
-```
-
----
-
-### Interest Calculator
-
-| Method | Endpoint                     | Description                                |
-| ------ | ---------------------------- | ------------------------------------------ |
-| `POST` | `/api/v1/interest/calculate` | Calculate simple interest and total amount |
-
-**Example Request**
-
-```json
-{
-  "principal": 10000,
-  "rate": 6.5,
-  "time": 2
-}
-```
-
-**Example Response**
-
-```json
-{
-  "Interest": 1300,
-  "TotalAmount": 11300,
-  "Message": "Calculation successful"
-}
-```
-
----
-
-## Setup Instructions
-
-### Clone the Repository
-
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/banking-system-api.git
+git clone <repository_link>
 cd banking-system-api
 ```
-
-### Configure Database (MySQL)
-
-Edit `src/main/resources/application.properties`:
+### 2. Configure MySQL
+application.properties:
 
 ```properties
+
 spring.datasource.url=jdbc:mysql://localhost:3306/bankdb
 spring.datasource.username=root
 spring.datasource.password=yourpassword
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 ```
-
-(For quick testing, you can switch to H2 in-memory DB.)
-
----
-
-### Build & Run the Application
+### 3. Run the Application
 
 ```bash
-mvn clean install
 mvn spring-boot:run
+
+Runs on:
+http://localhost:8080
 ```
 
-App runs at:
-👉 [http://localhost:8080](http://localhost:8080)
+### ⭐ Highlights
+- Production-level architecture
 
----
+- DTO-based clean API communication
 
-## 🧪 Testing
+- Transaction-safe fund transfers
 
-Run unit tests:
+- Aggregation reports via JPQL
 
-```bash
-mvn test
-```
+- Strategy Pattern for penalty logic
 
-Includes:
+- CSV/PDF export utilities
 
-* Interest calculation tests
-* Fund transfer validation
-* Deposit/withdrawal tests
-* Transaction history integrity
+- Extendable service-driven design
 
----
-
-## 📂 Project Structure
-
-```
-src/
- ├── main/java/com/example/bankingsystem/
- │   ├── controller/       # REST Controllers
- │   ├── service/          # Business Logic
- │   ├── dto/              # Data Transfer Objects
- │   ├── model/            # Entity Models
- │   ├── repository/       # JPA Repositories
- │   └── exception/        # Global Exception Handling
- └── test/java/...         # JUnit Test Cases
-```
-
----
-
-## Highlights
-
-* Clean architecture with layered design
-* DTOs for clean API data exchange
-* Validation and custom exceptions
-* Transaction-safe fund transfers
-* Reusable business logic services
-
----
-
-
-## 🪪 License
-
+🪪 License
 This project is for educational and demonstration purposes.
