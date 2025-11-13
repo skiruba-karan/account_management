@@ -19,11 +19,13 @@ This project also focuses on **transaction safety**, **data consistency**, **str
 - View all accounts  
 
 ### ✔ Endpoints
+```
 POST /accounts
 GET /accounts/{id}
 POST /accounts/{id}/deposit
 POST /accounts/{id}/withdraw
 GET /accounts
+```
 ---
 
 ## 2️⃣ Fund Transfers
@@ -34,7 +36,9 @@ GET /accounts
 - Uses `@Transactional` to ensure atomic debit/credit  
 
 ### ✔ Endpoint
+```
 POST /accounts/transfer
+```
 ---
 
 ## 3️⃣ Transaction History
@@ -43,7 +47,9 @@ POST /accounts/transfer
 - Fetches last N transactions for any account  
 
 ### ✔ Endpoint
+```
 GET /accounts/{id}/transactions
+```
 ---
 
 ## 4️⃣ Simple Interest Calculator
@@ -53,7 +59,9 @@ GET /accounts/{id}/transactions
 - Validates all input fields  
 
 ### ✔ Endpoint
+```
 POST /calculateInterest
+```
 ---
 
 ## 5️⃣ Loan Eligibility Checker
@@ -83,7 +91,9 @@ POST /loanEligibility
 - Clean separation of business rules  
 
 ### ✔ Endpoint
+```
 POST /fixedDeposit
+```
 ---
 
 ## 7️⃣ Monthly Account Statement
@@ -103,7 +113,9 @@ Additional features:
 - Optional: Email delivery  
 
 ### ✔ Endpoint
+```
 GET /statement/{accountId}?month=MM&year=YYYY
+```
 ---
 
 ## 8️⃣ Admin Dashboard Analytics
@@ -119,11 +131,13 @@ Includes:
 - Full consolidated report  
 
 ### ✔ Endpoints
+```
 GET /admin/totalCustomers
 GET /admin/totalDeposits
 GET /admin/topAccounts
 GET /admin/loanSummary
 GET /admin/fullReport
+```
 ---
 
 ## 9️⃣ Loan Management Module
@@ -136,13 +150,16 @@ Handles the loan lifecycle:
 - Close a loan  
 
 ### ✔ Endpoints
+```
 POST /loans
 GET /loans
 GET /loans/{loanId}
 PUT /loans/{loanId}/close
+```
 ---
 
 # ⚙️ Tech Stack
+```
 
 | Component | Technology |
 |----------|------------|
@@ -154,12 +171,14 @@ PUT /loans/{loanId}/close
 | Build Tool | Maven |
 | Testing | JUnit 5 |
 | API Docs (Optional) | Swagger / Springdoc |
+```
 
 ---
 
 # 🧠 Architecture
 
 This project follows a **clean layered architecture**:
+```
 
 src/main/java/com/example/bankingsystem/
 ├── controller/ → REST endpoints
@@ -170,6 +189,7 @@ src/main/java/com/example/bankingsystem/
 ├── util/ → Exporters, strategy classes
 ├── exception/ → Global exception handling
 └── config/ → App configs (Swagger, caching)
+```
 ---
 
 # 🧱 SOLID Principles Applied
