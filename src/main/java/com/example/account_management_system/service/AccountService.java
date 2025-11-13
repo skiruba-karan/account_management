@@ -2,10 +2,13 @@ package com.example.account_management_system.service;
 
 import com.example.account_management_system.exception.BankingException;
 import com.example.account_management_system.model.Account;
+import com.example.account_management_system.model.Transaction;
 import com.example.account_management_system.repository.AccountRepository;
+import com.example.account_management_system.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -13,16 +16,29 @@ import java.util.Map;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
+    private void logTransaction(Long accountId, String type, double amount){
+        Transaction tr = new Transaction();
+        tr.setAccountId(accountId);
+        tr.setType(type);
+        tr.setAmount(amount);
+        tr.setTimestamp(LocalDateTime.now());
+        transactionRepository.save(tr);
+    }
 
     public Account createAccount(String name,double initalDeposit){
         Account account = new Account(name,initalDeposit);
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+        logTransaction(savedAccount.getAccountId(),"INITIAL_DEPOSIT",initalDeposit);
+        return savedAccount;
+
 
     }
 
@@ -40,6 +56,7 @@ public class AccountService {
                 .orElseThrow(()->new BankingException("Account not found"));
         account.setBalance(account.getBalance()+amount);
         accountRepository.save(account);
+        logTransaction(id,"DEPOSIT",amount);
         return Map.of("accountID",id,"balance",account.getBalance());
     }
 
@@ -53,10 +70,10 @@ public class AccountService {
         }
         account.setBalance(account.getBalance()-amount);
         accountRepository.save(account);
+        logTransaction(id,"WITHDRAW",amount);
         return Map.of("accountID",id,"balance",account.getBalance());
 
     }
-
 
     @Transactional
     public Map<String,Object> transferFunds(Long fromAccountId, Long toAccountId, double amount){
@@ -79,6 +96,9 @@ public class AccountService {
         }
         fromAccount.setBalance(fromAccount.getBalance()-amount);
         toAccount.setBalance(toAccount.getBalance()+amount);
+
+        logTransaction(fromAccountId,"TRANSFER_OUT",amount);
+        logTransaction(toAccountId,"TRANSFER_IN",amount);
 
         return Map.of(
            "statusMessage","Transaction Completed",
