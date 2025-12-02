@@ -22,8 +22,8 @@ public class LoanEligibilityRequest {
     private double annualIncome;
 
     @NotNull(message = "Credit score is required")
-    @Min(value = 20, message = "Credit score must be atleast 300")
-    @Max(value = 60, message="Credit score must not exceed 900")
+    @Min(value = 300, message = "Credit score must be atleast 300")
+    @Max(value = 900, message="Credit score must not exceed 900")
     private int creditScore;
 
     @NotNull(message = "Existing loan amount is required")
