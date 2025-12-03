@@ -14,6 +14,6 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     @Query("SELECT COALESCE(SUM(a.balance),0) FROM Account a")
     double sumAllBalances();
 
-    @Query("SELECT new TopAccountDTO(a.accountId, a.balance) FROM Account a Where a.balancee > :minBalance")
+    @Query("SELECT new com.example.account_management_system.dto.TopAccountDTO(a.accountId, a.balance) FROM Account a Where a.balance > :minBalance")
     List<TopAccountDTO> findTopBalanceAccounts(double minBalance);
 }

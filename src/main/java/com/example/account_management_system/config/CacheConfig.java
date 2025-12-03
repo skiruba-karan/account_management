@@ -1,4 +1,4 @@
-package com.example.account_management_system;
+package com.example.account_management_system.config;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,7 +13,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManage(){
         return new ConcurrentMapCacheManager(
-                "totalCustommers","totalDeposits","topAccounts","loanSummary","adminReport"
+                "totalCustomers","totalDeposits","topAccounts","loanSummary","adminReport"
         );
     }
 
