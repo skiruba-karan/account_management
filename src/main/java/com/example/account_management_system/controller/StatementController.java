@@ -48,7 +48,7 @@ public class StatementController {
                     .header("Content-Disposition","attachment; filename = statement.pdf")
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(data);
-            
+
         }else {
             throw new IllegalArgumentException("Unsupported export type: "+type);
         }
