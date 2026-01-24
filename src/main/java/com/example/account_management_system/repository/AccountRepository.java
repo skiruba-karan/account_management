@@ -4,6 +4,7 @@ import com.example.account_management_system.dto.TopAccountDTO;
 import com.example.account_management_system.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     double sumAllBalances();
 
     @Query("SELECT new com.example.account_management_system.dto.TopAccountDTO(a.accountId, a.balance) FROM Account a Where a.balance > :minBalance")
-    List<TopAccountDTO> findTopBalanceAccounts(double minBalance);
+    List<TopAccountDTO> findTopBalanceAccounts(@Param("minBalance")double minBalance);
 }

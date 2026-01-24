@@ -3,6 +3,10 @@ package com.example.account_management_system.controller;
 import com.example.account_management_system.config.JwtUtil;
 import com.example.account_management_system.model.User;
 import com.example.account_management_system.repository.UserRepository;
+import com.example.account_management_system.service.LogoutService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +19,14 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
+    private final LogoutService logoutService;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder encoder, JwtUtil jwtUtil) {
+
+    public AuthController(UserRepository userRepository, PasswordEncoder encoder, JwtUtil jwtUtil, LogoutService logoutService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.jwtUtil = jwtUtil;
+        this.logoutService = logoutService;
     }
 
     @PostMapping("/register")
@@ -53,4 +60,26 @@ public class AuthController {
 
         return Map.of("token", token);
     }
+
+    @RestController
+    @RequestMapping("/auth")
+    public class LogoutController {
+
+        private final LogoutService logoutService;
+
+        public LogoutController(LogoutService logoutService) {
+            this.logoutService = logoutService;
+        }
+
+        @PostMapping("/logout")
+        public ResponseEntity<?> logout(
+                @RequestHeader("Authorization") String authHeader) {
+
+            logoutService.logout(authHeader);
+            return ResponseEntity.ok(
+                    Map.of("message", "Logout successful")
+            );
+        }
+    }
+
 }

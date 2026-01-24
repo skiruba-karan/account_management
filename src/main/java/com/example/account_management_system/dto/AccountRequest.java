@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AccountRequest {
+    private Long userId;
     private String name;
     private double initialDeposit;
     private double amount;
