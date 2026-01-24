@@ -1,10 +1,12 @@
 package com.example.account_management_system.config;
 
+import com.example.account_management_system.service.LogoutService;
 import com.example.account_management_system.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,9 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    @Autowired
+    private LogoutService logoutService;
+
     private final UserDetailsServiceImpl userDetailsService;
 
     public JwtFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
@@ -58,6 +63,11 @@ public class JwtFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+        if (token != null && logoutService.isBlacklisted(token)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Token has been logged out");
+            return;
         }
 
         filterChain.doFilter(request, response);

@@ -1,9 +1,6 @@
 package com.example.account_management_system.controller;
 
-import com.example.account_management_system.dto.ATMResponse;
-import com.example.account_management_system.dto.CardValidationRequest;
-import com.example.account_management_system.dto.PinVerificationRequest;
-import com.example.account_management_system.dto.WithdrawRequest;
+import com.example.account_management_system.dto.*;
 import com.example.account_management_system.service.ATMService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +12,11 @@ public class ATMController {
 
     public ATMController(ATMService atmService){
         this.atmService = atmService;
+    }
+
+    @PostMapping("/createCard")
+    public ATMCardResponse createCard(@RequestBody CreateCardRequest request){
+        return atmService.createCard(request);
     }
 
     @PostMapping("/validateCard")

@@ -144,9 +144,12 @@ public class ATMService {
                    .message("Invalid card number")
                    .build();
         }
+        var account = cardOpt.get().getAccount();
         return ATMResponse.builder()
                 .message("Balance fetched successfully")
+                .balance(account.getBalance())
                 .build();
+
     }
 
 

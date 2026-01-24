@@ -1,11 +1,13 @@
 package com.example.account_management_system.controller;
 
 import com.example.account_management_system.dto.AccountRequest;
+import com.example.account_management_system.dto.AccountResponse;
 import com.example.account_management_system.dto.TransferRequest;
 import com.example.account_management_system.model.Account;
 import com.example.account_management_system.model.Transaction;
 import com.example.account_management_system.repository.TransactionRepository;
 import com.example.account_management_system.service.AccountService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +26,30 @@ public class AccountController {
 
     @PostMapping
     public Map<String,Object> createAccount(@RequestBody AccountRequest request){
-        Account account = accountService.createAccount(request.getName(),request.getInitialDeposit());
+        Account account = accountService.createAccountForUser(
+                request.getUserId(),
+                request.getName(),
+                request.getInitialDeposit());
         return Map.of("accountID",account.getAccountId(),"balance",account.getBalance());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<Account> getAllAccount(){
         return accountService.getAllAccounts();
     }
 
     @GetMapping("/{id}")
-    public Account getAccount(@PathVariable Long id) {
-        return accountService.getAccount(id);
+    public AccountResponse getAccount(@PathVariable Long id) {
+        Account account = accountService.getAccount(id);
+        Long userId = (account.getUser() != null) ? account.getUser().getId() : null;
+
+        return new AccountResponse(
+                account.getAccountId(),
+                userId,
+                account.getName(),
+                account.getBalance()
+        );
     }
 
     @PostMapping("/{id}/deposit")
