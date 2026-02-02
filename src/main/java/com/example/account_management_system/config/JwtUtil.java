@@ -11,43 +11,45 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static String SECRET;
-    private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 24 hrs
+    private final Key key;
+    private final long expiration;
 
-    private Key key;
-
-    @Value("${JWT_SECRET}")
-    public void setSecret(String secret) {
-        SECRET = secret;
-        this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    public JwtUtil(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long expiration
+    ) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expiration = expiration;
     }
+
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return getClaims(token).getSubject();
+        return extractClaims(token).getSubject();
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
     }
 
     public boolean isTokenValid(String token) {
         try {
-            getClaims(token);
+            extractClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }
     }
-    public Date extractExpiration(String token) {
-        return getClaims(token).getExpiration();
-    }
 
-    private Claims getClaims(String token) {
+    private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
